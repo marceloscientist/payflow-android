@@ -73,20 +73,24 @@ O PayFlow centraliza essas informações em uma única experiência.
 - Consumo de API
 - MVVM
 - Jetpack Compose
+- Design System Compartilhado
+- Developer Playground
 
 ---
 
 ## Não Incluído
 
 - Open Banking
-- PIX
+- PIX como método de pagamento real
 - Pagamento de contas
 - Controle financeiro completo
 - Assinaturas compartilhadas
 - Multiusuário colaborativo
 - Controle de inadimplência
 - Notificações avançadas
-- Integrações com plataformas reais
+- Integrações reais com Netflix, Spotify ou outros serviços
+- Envio automático de e-mails
+- Administração de cartões bancários
 
 ---
 
@@ -124,37 +128,58 @@ O usuário permanece autenticado até realizar logout.
 
 # Navegação
 
-## Bottom Navigation
+## Rotas Primárias
 
-- Dashboard
-- Assinaturas
-- Simulador
-- Perfil
+As rotas principais serão acessíveis através da Bottom Navigation.
+
+- 🏠 Dashboard
+- 📺 Assinaturas
+- 💰 Simulador
+- 👤 Perfil
+- ⋯ Developer Playground
 
 ---
 
-## Telas
+## Rotas Secundárias
 
-### 1. Login
+As rotas secundárias representam fluxos contextuais e não fazem parte da Bottom Navigation.
+
+Exemplos:
+
+- ➕ Nova Assinatura
+- 📄 Detalhes da Assinatura
+- ✏️ Editar Assinatura
+
+Acesso através de:
+
+- Floating Action Button (FAB)
+- Clique em itens da lista
+- Botões específicos da interface
+
+---
+
+# Telas
+
+## 1. Login
 
 Entrada do usuário através da conta Google.
 
 ---
 
-### 2. Dashboard
+## 2. Dashboard
 
 Visão geral do usuário.
 
-Indicadores:
+Indicadores previstos:
 
-- Gasto Mensal
-- Gasto Anual
+- Projeção de Gasto Mensal
+- Projeção de Gasto Anual
 - Assinaturas Ativas
 - Próximos Vencimentos
 
 ---
 
-### 3. Assinaturas
+## 3. Assinaturas
 
 Listagem das assinaturas cadastradas.
 
@@ -163,17 +188,28 @@ Funcionalidades:
 - Pesquisa
 - Filtros
 - Visualização
-- Acesso ao cadastro
+- Cadastro
+- Acesso aos detalhes
 
 ---
 
-### 4. Nova Assinatura
+## 4. Nova Assinatura
 
-Cadastro guiado de novas assinaturas.
+Cadastro guiado progressivo.
+
+Campos:
+
+- Serviço
+- Plano (opcional)
+- Valor
+- Periodicidade
+- Dia da Cobrança
+- Método de Pagamento (opcional)
+- Observações (opcional)
 
 ---
 
-### 5. Detalhes da Assinatura
+## 5. Detalhes da Assinatura
 
 Visualização completa da assinatura.
 
@@ -185,36 +221,63 @@ Funcionalidades:
 
 ---
 
-### 6. Savings Simulator
+## 6. Savings Simulator
 
 Simulação de economia.
 
-Permite ao usuário selecionar serviços e visualizar:
+Permite selecionar assinaturas para projeção de economia.
+
+Indicadores:
 
 - Economia Mensal
 - Economia Anual
 
 ---
 
-### 7. Perfil
+## 7. Perfil
 
 Dados do usuário e configurações.
+
+Funcionalidades previstas:
+
+- Foto do usuário
+- Nome
+- E-mail
+- Tema
+- Preferências futuras
+- Logout
+
+---
+
+## 8. Developer Playground
+
+Área interna destinada à demonstração e validação dos componentes compartilhados.
+
+Objetivos:
+
+- Documentação viva
+- Catálogo de componentes
+- Teste visual
+- Padronização visual
+- Apoio aos desenvolvedores
 
 ---
 
 # Categorias
 
-- Streaming
-- Música
-- Games
-- IA & Produtividade
-- Cloud Storage
-- Educação
-- Outros
+- STREAMING
+- MUSIC
+- GAMES
+- AI_PRODUCTIVITY
+- CLOUD_STORAGE
+- EDUCATION
+- OTHER
 
 ---
 
 # Status das Assinaturas
+
+Possíveis estados:
 
 ACTIVE
 
@@ -222,7 +285,7 @@ CANCELLED
 
 Não haverá exclusão física.
 
-Ao cancelar:
+Fluxo:
 
 ACTIVE
 ↓
@@ -247,6 +310,7 @@ Exemplos:
 - ChatGPT Plus
 - Canva Pro
 - Google One
+- Adobe Creative Cloud
 
 Também será possível cadastrar:
 
@@ -256,13 +320,13 @@ Outro Serviço
 
 # API
 
-API utilizada para fornecer catálogo de serviços digitais.
+A API será utilizada para fornecer o catálogo de serviços digitais.
 
 Objetivos:
 
 - Catálogo centralizado
 - Evolução futura
-- Atendimento ao requisito do projeto
+- Atendimento ao requisito acadêmico do projeto
 
 ---
 
@@ -278,40 +342,50 @@ MVVM
 
 Feature-Based MVVM
 
-Estrutura:
+Cada feature possui seus próprios pacotes:
 
-feature/
-auth/
-dashboard/
-subscriptions/
-simulator/
-profile/
+```text
+ui/
+viewmodel/
+model/
+```
 
 ---
 
 # Estrutura Inicial
 
+```text
 app/
 
 core/
-components/
-theme/
-navigation/
-catalog/
-utils/
+├── components/
+├── navigation/
+├── theme/
+├── catalog/
+├── state/
+└── utils/
 
 feature/
-auth/
-dashboard/
-subscriptions/
-simulator/
-profile/
+├── auth/
+├── dashboard/
+├── subscriptions/
+├── simulator/
+├── profile/
+└── developerplayground/
 
 data/
-local/
-remote/
+├── local/
+│   ├── dao/
+│   ├── entity/
+│   └── database/
+│
+└── remote/
+    ├── api/
+    ├── dto/
+    └── repository/
 
 model/
+```
 
 ---
 
@@ -325,69 +399,92 @@ Material Design 3
 
 # Componentes Oficiais
 
-PayFlowTopBar
+## Layout
 
-PayFlowBottomNavigation
+- PayFlowTopBar
+- PayFlowBottomNavigation
 
-PayFlowButton
+## Entradas
 
-PayFlowTextField
+- PayFlowTextField
+- PayFlowDropdown
+- PayFlowSearchBar
 
-PayFlowDropdown
+## Ações
 
-PayFlowSearchBar
+- PayFlowButton
+- PayFlowConfirmationDialog
 
-PayFlowCard
+## Conteúdo
 
-PayFlowMetricCard
+- PayFlowCard
+- PayFlowMetricCard
+- PayFlowSubscriptionCard
 
-PayFlowSubscriptionCard
+## Perfil
 
-PayFlowProfileHeader
+- PayFlowProfileHeader
+- PayFlowSettingsItem
 
-PayFlowSettingsItem
+## Feedback
 
-PayFlowChip
+- PayFlowLoadingState
+- PayFlowEmptyState
+- PayFlowStatusBadge
 
-PayFlowStatusBadge
+## Auxiliares
 
-PayFlowLoadingState
-
-PayFlowEmptyState
-
-PayFlowConfirmationDialog
+- PayFlowChip
 
 ---
 
 ## Regra
 
-Antes de criar um novo componente:
+Antes de criar qualquer componente novo:
 
-1. Verificar se já existe em core/components
+1. Verificar se já existe em `core/components`
 2. Caso não exista, propor ao grupo
 3. Construir de forma compartilhada
 4. Disponibilizar para reutilização
 
 ---
 
-# DesignSystemScreen
+# Developer Playground
 
-Tela interna destinada a exibir todos os componentes reutilizáveis do projeto.
+Tela interna destinada à demonstração dos componentes compartilhados.
 
-Objetivos:
+Conteúdo previsto:
 
-- Documentação viva
-- Demonstração visual
-- Padronização do time
-- Facilitar implementação
+- PayFlowButton
+- PayFlowCard
+- PayFlowTextField
+- PayFlowSearchBar
+- PayFlowMetricCard
+- PayFlowSubscriptionCard
+- PayFlowProfileHeader
+- PayFlowSettingsItem
+- PayFlowLoadingState
+- PayFlowEmptyState
+- PayFlowConfirmationDialog
 
 ---
 
 # Entidades
 
+## User
+
+Campos:
+
+- id
+- displayName
+- email
+- photoUrl
+
+---
+
 ## Subscription
 
-Campos previstos:
+Campos:
 
 - id
 - userId
@@ -403,6 +500,39 @@ Campos previstos:
 - status
 - createdAt
 - cancelledAt
+
+---
+
+## Enums
+
+### Category
+
+- STREAMING
+- MUSIC
+- GAMES
+- AI_PRODUCTIVITY
+- CLOUD_STORAGE
+- EDUCATION
+- OTHER
+
+### BillingFrequency
+
+- MONTHLY
+- YEARLY
+
+### SubscriptionStatus
+
+- ACTIVE
+- CANCELLED
+
+### PaymentMethod
+
+- CREDIT_CARD
+- PIX
+- PAYPAL
+- GOOGLE_PLAY
+- APP_STORE
+- OTHER
 
 ---
 
@@ -450,15 +580,72 @@ Google Sign-In.
 
 ---
 
+## DA-008
+
+Feature-Based MVVM.
+
+Cada feature possui:
+
+- ui
+- viewmodel
+- model
+
+---
+
+## DA-009
+
+Developer Playground como documentação viva do projeto.
+
+---
+
+## DA-010
+
+Rotas secundárias não fazem parte da Bottom Navigation.
+
+---
+
+## DA-011
+
+Design System baseado em Material Design 3.
+
+---
+
+## DA-012
+
+Assinaturas podem possuir múltiplas ocorrências do mesmo serviço.
+
+---
+
+## DA-013
+
+Exclusão física de assinaturas não será permitida.
+
+Fluxo:
+
+ACTIVE → CANCELLED
+
+---
+
+## DA-014
+
+Usuário individual.
+
+Não haverá compartilhamento de assinaturas entre usuários.
+
+---
+
 # Roadmap
 
 ## Sprint 0
 
 - README
 - Estrutura do Projeto
+- Models
 - Navigation
 - Design System
-- DesignSystemScreen
+- Developer Playground
+
+---
 
 ## Sprint 1
 
@@ -467,12 +654,16 @@ Google Sign-In.
 - Assinaturas
 - Cadastro
 
+---
+
 ## Sprint 2
 
 - Savings Simulator
 - Perfil
-- Persistência
+- Persistência Local
 - API
+
+---
 
 ## Sprint 3
 
@@ -494,4 +685,4 @@ Grupo 04
 - Lucas
 - Gutemberg
 
-Responsabilidades serão definidas após a conclusão da Sprint 0.
+As responsabilidades serão definidas após a conclusão da Sprint 0.
