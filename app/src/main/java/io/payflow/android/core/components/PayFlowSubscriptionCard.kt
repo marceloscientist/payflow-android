@@ -1,11 +1,13 @@
 package io.payflow.android.core.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun PayFlowSubscriptionCard(
@@ -20,24 +22,29 @@ fun PayFlowSubscriptionCard(
         modifier = modifier.fillMaxWidth()
     ) {
 
-        Text(
-            text = serviceName,
-            style = MaterialTheme.typography.titleMedium
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
 
-        Text(
-            text = plan,
-            style = MaterialTheme.typography.bodyMedium
-        )
+            Text(
+                text = serviceName,
+                style = MaterialTheme.typography.titleLarge
+            )
 
-        Text(
-            text = price,
-            style = MaterialTheme.typography.titleSmall
-        )
+            Text(
+                text = plan,
+                style = MaterialTheme.typography.bodyMedium
+            )
 
-        Text(
-            text = billingInfo,
-            style = MaterialTheme.typography.bodySmall
-        )
+            Text(
+                text = price,
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text(
+                text = billingInfo,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
     }
 }

@@ -1,8 +1,12 @@
 package io.payflow.android.core.components.catalog
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -26,6 +30,9 @@ import io.payflow.android.core.components.PayFlowStatusBadge
 import io.payflow.android.core.components.PayFlowSubscriptionCard
 import io.payflow.android.core.components.PayFlowTextField
 import io.payflow.android.core.components.PayFlowTopBar
+import io.payflow.android.core.components.model.PayFlowButtonType
+import io.payflow.android.core.components.model.PayFlowStatusType
+import io.payflow.android.core.theme.PayFlowSpacing
 
 @Composable
 fun DesignSystemScreen() {
@@ -45,13 +52,33 @@ fun DesignSystemScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .verticalScroll(
+                rememberScrollState()
+            )
+            .padding(16.dp),
+
+        verticalArrangement = Arrangement.spacedBy(
+            PayFlowSpacing.MD
+        )
     ) {
 
         Text("Developer Playground")
 
         PayFlowButton(
-            text = "Botão Primário",
+            text = "Salvar",
+            type = PayFlowButtonType.PRIMARY,
+            onClick = {}
+        )
+
+        PayFlowButton(
+            text = "Editar",
+            type = PayFlowButtonType.SECONDARY,
+            onClick = {}
+        )
+
+        PayFlowButton(
+            text = "Cancelar Assinatura",
+            type = PayFlowButtonType.DANGER,
             onClick = {}
         )
 
@@ -63,9 +90,10 @@ fun DesignSystemScreen() {
             label = "Digite algo"
         )
 
-        PayFlowCard() {
+        PayFlowCard {
+
             Text(
-                text = "PayFlow Card"
+                text = "Componente base utilizado para agrupar conteúdo."
             )
         }
 
@@ -96,13 +124,45 @@ fun DesignSystemScreen() {
         )
 
         PayFlowStatusBadge(
-            text = "ACTIVE"
+            type = PayFlowStatusType.ACTIVE
         )
 
-        PayFlowChip(
-            label = "Streaming",
-            onClick = {}
+        PayFlowStatusBadge(
+            type = PayFlowStatusType.CANCELLED
         )
+
+        PayFlowStatusBadge(
+            type = PayFlowStatusType.PENDING
+        )
+
+        PayFlowStatusBadge(
+            type = PayFlowStatusType.EXPIRED
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            PayFlowChip(
+                label = "Streaming",
+                onClick = {}
+            )
+
+            PayFlowChip(
+                label = "Music",
+                onClick = {}
+            )
+
+            PayFlowChip(
+                label = "Games",
+                onClick = {}
+            )
+
+            PayFlowChip(
+                label = "AI",
+                onClick = {}
+            )
+        }
 
         PayFlowTopBar(
             title = "PayFlow"
@@ -116,16 +176,10 @@ fun DesignSystemScreen() {
         )
 
         PayFlowSettingsItem(
-            title = "Tema Escuro",
+            title = "Notificações",
             onClick = {}
         )
 
-        PayFlowButton(
-            text = "Abrir Dialog",
-            onClick = {
-                showDialog = true
-            }
-        )
 
         if (showDialog) {
 

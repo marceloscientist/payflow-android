@@ -1,6 +1,5 @@
 package io.payflow.android.core.components
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,12 +19,12 @@ fun PayFlowMetricCard(
 
         Text(
             text = value,
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineMedium
         )
 
         Text(
             text = title,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyLarge
         )
     }
 }
