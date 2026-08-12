@@ -1,4 +1,4 @@
-package io.payflow.android.ui.theme
+package io.payflow.android.core.theme
 
 import android.app.Activity
 import android.os.Build
