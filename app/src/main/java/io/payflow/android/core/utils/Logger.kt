@@ -1,16 +1,21 @@
-package io.payflow.android.core.dispatcher
+package io.payflow.android.core.utils
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import android.util.Log
 
-object DispatcherProvider {
+object Logger {
 
-    val io: CoroutineDispatcher
-        get() = Dispatchers.IO
+    fun debug(
+        tag: String,
+        message: String
+    ) {
+        Log.d(tag, message)
+    }
 
-    val main: CoroutineDispatcher
-        get() = Dispatchers.Main
-
-    val default: CoroutineDispatcher
-        get() = Dispatchers.Default
+    fun error(
+        tag: String,
+        message: String,
+        throwable: Throwable? = null
+    ) {
+        Log.e(tag, message, throwable)
+    }
 }
