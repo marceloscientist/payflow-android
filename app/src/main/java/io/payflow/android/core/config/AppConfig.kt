@@ -9,5 +9,5 @@ object AppConfig {
 
     const val READ_TIMEOUT_SECONDS = 30L
 
-    const val SHOW_DEVELOPER_PLAYGROUND = false
+        const val SHOW_DEVELOPER_PLAYGROUND = false
 }
