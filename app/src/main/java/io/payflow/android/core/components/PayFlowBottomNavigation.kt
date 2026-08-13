@@ -12,6 +12,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import io.payflow.android.core.config.AppConfig
 import io.payflow.android.core.navigation.Routes
 
 @Composable
@@ -86,20 +87,22 @@ fun PayFlowBottomNavigation(
             }
         )
 
-        NavigationBarItem(
-            selected = currentRoute == Routes.DeveloperPlayground.route,
-            onClick = {
-                navController.navigate(Routes.DeveloperPlayground.route)
-            },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.MoreHoriz,
-                    contentDescription = "Developer Playground"
-                )
-            },
-            label = {
-                Text("Mais")
-            }
-        )
+        if (AppConfig.SHOW_DEVELOPER_PLAYGROUND) {
+            NavigationBarItem(
+                selected = currentRoute == Routes.DeveloperPlayground.route,
+                onClick = {
+                    navController.navigate(Routes.DeveloperPlayground.route)
+                },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.MoreHoriz,
+                        contentDescription = "Developer Playground"
+                    )
+                },
+                label = {
+                    Text("Mais")
+                }
+            )
+        }
     }
 }

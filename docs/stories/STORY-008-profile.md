@@ -1,80 +1,66 @@
-# STORY-008 - Profile
+Eu atualizaria a STORY-008 desta forma, mantendo o MVP simples mas já preparando o Profile para trabalhar com sessão persistida.
 
-## Branch
+STORY-008 - Profile
+Branch
 
 feature/profile
 
----
-
-## Dependências
+Dependências
 
 Obrigatórias:
 
-- STORY-003-auth-and-navigation
+STORY-003-auth-and-navigation
 
 Pode iniciar após:
 
-- Navegação principal funcionando
-- MainScreen funcionando
-- Bottom Navigation funcionando
-
----
-
-## Objetivo
+Navegação principal funcionando
+MainScreen funcionando
+Bottom Navigation funcionando
+Objetivo
 
 Implementar a tela de Perfil do usuário.
 
-Esta história complementa o fluxo principal do aplicativo e representa uma das telas opcionais recomendadas para o MVP. 【1-080b72】
+A tela deve exibir informações da sessão atual do usuário e configurações básicas da aplicação.
 
----
-
-## Requisito do Professor
-
-O direcionamento oficial permite telas complementares como:
-
-- Perfil
-- Configurações
-- Segurança
-- Preferências
-
-Esta história será responsável pela implementação da área de Perfil do usuário. 【1-080b72】
-
----
-
-## Escopo
+Escopo
 
 Implementar:
 
 Profile Screen
 
----
-
-## Informações Exibidas
-
-### Dados do Usuário
+Dados do Usuário
 
 Exibir:
 
-- Nome
-- E-mail
+Nome
+E-mail
 
 Utilizar:
 
 PayFlowProfileHeader
 
-Nesta versão os dados podem ser mockados.
+Os dados devem ser carregados do mecanismo de sessão da aplicação.
 
-Exemplo:
+Caso não existam dados persistidos, utilizar valores padrão:
 
 Nome:
-Marcelo Santana
+Usuário PayFlow
 
 E-mail:
-marcelo@email.com
+usuario@payflow.app
 
----
+Sessão do Usuário
 
-## Configurações
+Utilizar DataStore para persistir:
+
+userName
+userEmail
+isLoggedIn
+
+
+O Profile deverá consumir essas informações.
+
+Configurações
 
 Utilizar:
 
@@ -82,87 +68,72 @@ PayFlowSettingsItem
 
 Itens sugeridos:
 
-- Notificações
-- Política de Privacidade
-- Termos de Uso
-- Sobre o Aplicativo
-
----
-
-## Informações do Aplicativo
+Notificações
+Política de Privacidade
+Termos de Uso
+Sobre o Aplicativo
+Informações do Aplicativo
 
 Exibir:
 
-- Nome do Aplicativo
-- Versão
-- Equipe Responsável
-
-Exemplo:
-
 PayFlow
+Versão 1.0.0
+Equipe Responsável
 
-Versão:
-1.0.0
-
----
-
-## Componentes Obrigatórios
+Componentes Obrigatórios
 
 Utilizar:
 
-- PayFlowProfileHeader
-- PayFlowSettingsItem
-- PayFlowCard
-- PayFlowTopBar
+PayFlowProfileHeader
+PayFlowSettingsItem
+PayFlowCard
+PayFlowTopBar
 
 Não criar novos componentes.
 
----
-
-## Estrutura Esperada
-
+Estrutura Esperada
 feature/profile
 
 ├── ui
 ├── viewmodel
 └── model
 
----
-
-## ViewModel
-
-Opcional para o MVP.
-
-Caso implementado:
+ViewModel
 
 Criar:
 
 ProfileViewModel
 
+
 Obrigatório:
 
-- Herdar BaseViewModel
-- Utilizar UiState
+Herdar BaseViewModel
+Utilizar UiState
+Persistência
 
----
+Implementar utilizando DataStore.
 
-## Persistência
+Dados mínimos:
 
-Não obrigatória nesta história.
+userName
+userEmail
+isLoggedIn
 
----
 
-## API
+Não utilizar Room.
 
-Não obrigatória nesta história.
+API
 
----
+Não obrigatória.
 
-## Navegação
+Os dados podem ser obtidos da sessão persistida localmente.
+
+Navegação
 
 Origem:
 
 Bottom Navigation
+
 
 Fluxo:
 
@@ -170,107 +141,68 @@ Main
 ↓
 Profile
 
----
+Critérios de Aceite
+Tela acessível pela Bottom Navigation
+Nome exibido corretamente
+E-mail exibido corretamente
+Dados carregados do DataStore
+Configurações exibidas corretamente
+Informações do aplicativo exibidas corretamente
+Design System reutilizado
+Não criar componentes duplicados
+Navegação funcionando sem erros
+Estados Esperados
+Loading
+Success
+Error
 
-## Critérios de Aceite
+Utilizando UiState.
 
-- [ ] Tela acessível pela Bottom Navigation
-- [ ] Nome exibido corretamente
-- [ ] E-mail exibido corretamente
-- [ ] Configurações exibidas corretamente
-- [ ] Informações do aplicativo exibidas corretamente
-- [ ] Design System reutilizado
-- [ ] Não criar componentes duplicados
-- [ ] Navegação funcionando sem erros
-
----
-
-## Estados Esperados
-
-- Success
-
-Loading e Error são opcionais para o MVP.
-
----
-
-## Fora de Escopo
+Fora de Escopo
 
 Não implementar:
 
-- Login real
-- Alteração de senha
-- Upload de foto
-- Cadastro de usuário
-- Integração com backend
-- Integração com redes sociais
-
----
-
-## Testes Manuais
-
-### Cenário 1
-
-Abrir aplicativo
-
-↓
-
-Selecionar Perfil
-
-Resultado esperado:
-
-Tela abre corretamente.
-
----
-
-### Cenário 2
-
-Visualizar:
-
-- Nome
-- E-mail
-
-Resultado esperado:
-
-Informações exibidas corretamente.
-
----
-
-### Cenário 3
-
-Selecionar:
-
-Sobre o Aplicativo
-
-Resultado esperado:
-
-Ação executada sem erro.
-
----
-
-## Observações Técnicas
+Login real
+Firebase Auth
+Google Sign-In
+OAuth
+Alteração de senha
+Upload de foto
+Cadastro de usuário
+Backend real
+Observações Técnicas
 
 Utilizar exclusivamente componentes já existentes no Design System.
 
-Não criar componentes específicos para esta tela.
-
 Reutilizar:
 
-- PayFlowProfileHeader
-- PayFlowSettingsItem
-- PayFlowCard
+PayFlowProfileHeader
+PayFlowSettingsItem
+PayFlowCard
 
----
+Persistência da sessão deve utilizar DataStore.
 
-## Resultado Esperado
+Resultado Esperado
 
-Ao final desta história o usuário consegue visualizar suas informações básicas e acessar configurações e informações institucionais da aplicação.
+Ao final desta história o usuário consegue visualizar suas informações básicas através de uma sessão persistida localmente utilizando DataStore.
 
----
+Minha recomendação como Tech Lead
 
-## Stories Relacionadas
+Com essa mudança, a STORY-003 continua simples:
 
-Relaciona-se com:
+Email
+Senha
+Entrar
+Navegação
 
-- STORY-003-auth-and-navigation
 
-Não desbloqueia outras histórias do MVP.
+E a STORY-008 assume a responsabilidade da sessão:
+
+DataStore
+userName
+userEmail
+isLoggedIn
+Profile
+
+
+Isso deixa a arquitetura mais limpa e evita que você invada as responsabilidades da STORY-001 (Room) e STORY-002 (API). 🚀
