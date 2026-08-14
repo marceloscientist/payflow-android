@@ -13,31 +13,31 @@ import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PayFlowDropdown() {
+fun PayFlowDropdown(
+    label: String,
+    options: List<String>,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     var expanded by remember { mutableStateOf(false) }
-
-    val options = listOf(
-        "Netflix",
-        "Spotify",
-        "Disney+"
-    )
-
-    var selectedOption by remember {
-        mutableStateOf(options.first())
-    }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = {
             expanded = !expanded
-        }
+        },
+        modifier = modifier
     ) {
 
         OutlinedTextField(
             value = selectedOption,
             onValueChange = {},
             readOnly = true,
+            label = {
+                Text(label)
+            },
             modifier = Modifier
                 .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 .fillMaxWidth(),
@@ -55,14 +55,14 @@ fun PayFlowDropdown() {
             }
         ) {
 
-            options.forEach {
+            options.forEach { option ->
 
                 DropdownMenuItem(
                     text = {
-                        Text(it)
+                        Text(option)
                     },
                     onClick = {
-                        selectedOption = it
+                        onOptionSelected(option)
                         expanded = false
                     }
                 )
