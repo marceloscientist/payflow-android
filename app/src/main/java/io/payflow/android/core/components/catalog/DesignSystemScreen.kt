@@ -49,6 +49,10 @@ fun DesignSystemScreen() {
         mutableStateOf(false)
     }
 
+    var selectedService by remember {
+        mutableStateOf("Netflix")
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -168,7 +172,12 @@ fun DesignSystemScreen() {
             title = "PayFlow"
         )
 
-        PayFlowDropdown()
+        PayFlowDropdown(
+            label = "Serviço",
+            options = listOf("Netflix", "Spotify", "Disney+"),
+            selectedOption = selectedService,
+            onOptionSelected = { selectedService = it }
+        )
 
         PayFlowProfileHeader(
             name = "Marcelo Santana",

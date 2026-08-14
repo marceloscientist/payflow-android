@@ -1,6 +1,10 @@
 package io.payflow.android.feature.main.ui
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,6 +21,7 @@ import io.payflow.android.core.session.repository.SessionRepository
 import io.payflow.android.feature.dashboard.ui.DashboardScreen
 import io.payflow.android.feature.profile.ui.ProfileScreen
 import io.payflow.android.feature.simulator.ui.SavingsSimulatorScreen
+import io.payflow.android.feature.subscriptions.ui.AddSubscriptionScreen
 import io.payflow.android.feature.subscriptions.ui.SubscriptionDetailsScreen
 import io.payflow.android.feature.subscriptions.ui.SubscriptionsScreen
 
@@ -39,6 +44,20 @@ fun MainScreen(
                 navController = navController,
                 currentRoute = currentRoute
             )
+        },
+        floatingActionButton = {
+            if (currentRoute == Routes.Subscriptions.route) {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate(Routes.AddSubscription.route)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Adicionar assinatura"
+                    )
+                }
+            }
         }
     ) { paddingValues ->
 
@@ -58,6 +77,17 @@ fun MainScreen(
                 SubscriptionsScreen(
                     onSubscriptionClick = { id ->
                         navController.navigate(Routes.SubscriptionDetails.navigate(id))
+                    }
+                )
+            }
+
+            composable(Routes.AddSubscription.route) {
+                AddSubscriptionScreen(
+                    onSaved = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
                     }
                 )
             }

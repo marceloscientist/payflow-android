@@ -16,7 +16,10 @@ fun PayFlowTextField(
     onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Email,
+    isError: Boolean = false,
+    supportingText: String? = null
 ) {
 
     OutlinedTextField(
@@ -26,6 +29,12 @@ fun PayFlowTextField(
             Text(label)
         },
         modifier = modifier.fillMaxWidth(),
+
+        isError = isError,
+
+        supportingText = supportingText?.let {
+            { Text(it) }
+        },
 
         visualTransformation =
             if (isPassword)
@@ -38,7 +47,7 @@ fun PayFlowTextField(
                 if (isPassword)
                     KeyboardType.Password
                 else
-                    KeyboardType.Email
+                    keyboardType
         )
     )
 }
