@@ -17,6 +17,7 @@ Pode iniciar após:
 - Navegação principal funcionando
 - MainScreen funcionando
 - Bottom Navigation funcionando
+- Infraestrutura de sessão disponível em `core/session`
 
 ---
 
@@ -24,20 +25,7 @@ Pode iniciar após:
 
 Implementar a tela de Perfil do usuário.
 
-Esta história complementa o fluxo principal do aplicativo e representa uma das telas opcionais recomendadas para o MVP. 【1-080b72】
-
----
-
-## Requisito do Professor
-
-O direcionamento oficial permite telas complementares como:
-
-- Perfil
-- Configurações
-- Segurança
-- Preferências
-
-Esta história será responsável pela implementação da área de Perfil do usuário. 【1-080b72】
+A tela deve exibir informações da sessão atual do usuário e configurações básicas da aplicação.
 
 ---
 
@@ -45,13 +33,11 @@ Esta história será responsável pela implementação da área de Perfil do usu
 
 Implementar:
 
-Profile Screen
+- Profile Screen
 
 ---
 
-## Informações Exibidas
-
-### Dados do Usuário
+## Dados do Usuário
 
 Exibir:
 
@@ -60,17 +46,48 @@ Exibir:
 
 Utilizar:
 
-PayFlowProfileHeader
+- PayFlowProfileHeader
 
-Nesta versão os dados podem ser mockados.
+Os dados devem ser carregados da infraestrutura de sessão disponível em:
 
-Exemplo:
+```text
+core/session
+```
 
+Utilizar:
+
+- UserSession
+- SessionRepository
+
+Caso não exista sessão ativa, utilizar:
+
+```text
 Nome:
-Marcelo Santana
+Usuário PayFlow
 
 E-mail:
-marcelo@email.com
+usuario@payflow.app
+```
+
+---
+
+## Sessão do Usuário
+
+Consumir:
+
+- UserSession
+
+Através de:
+
+- SessionRepository
+
+Dados disponíveis:
+
+```text
+name
+email
+isLoggedIn
+```
 
 ---
 
@@ -78,7 +95,7 @@ marcelo@email.com
 
 Utilizar:
 
-PayFlowSettingsItem
+- PayFlowSettingsItem
 
 Itens sugeridos:
 
@@ -93,16 +110,14 @@ Itens sugeridos:
 
 Exibir:
 
-- Nome do Aplicativo
-- Versão
-- Equipe Responsável
-
-Exemplo:
-
+```text
 PayFlow
 
 Versão:
 1.0.0
+
+Equipe Responsável
+```
 
 ---
 
@@ -121,23 +136,21 @@ Não criar novos componentes.
 
 ## Estrutura Esperada
 
+```text
 feature/profile
 
 ├── ui
 ├── viewmodel
 └── model
+```
 
 ---
 
 ## ViewModel
 
-Opcional para o MVP.
-
-Caso implementado:
-
 Criar:
 
-ProfileViewModel
+- ProfileViewModel
 
 Obrigatório:
 
@@ -148,13 +161,25 @@ Obrigatório:
 
 ## Persistência
 
-Não obrigatória nesta história.
+Não utilizar Room.
+
+Consumir os dados através do:
+
+- SessionRepository
+
+A implementação atual da sessão utiliza infraestrutura própria baseada em:
+
+- UserSession
+- SessionRepository
+- SessionRepositoryImpl
+
+Uma futura evolução poderá migrar a implementação para DataStore sem impacto na feature.
 
 ---
 
 ## API
 
-Não obrigatória nesta história.
+Não obrigatória.
 
 ---
 
@@ -162,13 +187,15 @@ Não obrigatória nesta história.
 
 Origem:
 
-Bottom Navigation
+- Bottom Navigation
 
 Fluxo:
 
+```text
 Main
 ↓
 Profile
+```
 
 ---
 
@@ -177,6 +204,7 @@ Profile
 - [ ] Tela acessível pela Bottom Navigation
 - [ ] Nome exibido corretamente
 - [ ] E-mail exibido corretamente
+- [ ] Dados carregados via SessionRepository
 - [ ] Configurações exibidas corretamente
 - [ ] Informações do aplicativo exibidas corretamente
 - [ ] Design System reutilizado
@@ -187,9 +215,15 @@ Profile
 
 ## Estados Esperados
 
-- Success
+Utilizar:
 
-Loading e Error são opcionais para o MVP.
+- Loading
+- Success
+- Error
+
+Através de:
+
+- UiState
 
 ---
 
@@ -198,52 +232,13 @@ Loading e Error são opcionais para o MVP.
 Não implementar:
 
 - Login real
+- Firebase Auth
+- Google Sign-In
+- OAuth
 - Alteração de senha
 - Upload de foto
 - Cadastro de usuário
-- Integração com backend
-- Integração com redes sociais
-
----
-
-## Testes Manuais
-
-### Cenário 1
-
-Abrir aplicativo
-
-↓
-
-Selecionar Perfil
-
-Resultado esperado:
-
-Tela abre corretamente.
-
----
-
-### Cenário 2
-
-Visualizar:
-
-- Nome
-- E-mail
-
-Resultado esperado:
-
-Informações exibidas corretamente.
-
----
-
-### Cenário 3
-
-Selecionar:
-
-Sobre o Aplicativo
-
-Resultado esperado:
-
-Ação executada sem erro.
+- Backend real
 
 ---
 
@@ -251,19 +246,31 @@ Ação executada sem erro.
 
 Utilizar exclusivamente componentes já existentes no Design System.
 
-Não criar componentes específicos para esta tela.
-
 Reutilizar:
 
 - PayFlowProfileHeader
 - PayFlowSettingsItem
 - PayFlowCard
+- PayFlowTopBar
+
+Não acessar diretamente estruturas de Auth.
+
+Consumir exclusivamente a infraestrutura compartilhada em:
+
+```text
+core/session
+```
 
 ---
 
 ## Resultado Esperado
 
-Ao final desta história o usuário consegue visualizar suas informações básicas e acessar configurações e informações institucionais da aplicação.
+Ao final desta história o usuário consegue visualizar suas informações básicas através da sessão atual da aplicação utilizando:
+
+- UserSession
+- SessionRepository
+
+A tela deve estar preparada para futuras evoluções da persistência sem necessidade de alterações significativas na feature.
 
 ---
 

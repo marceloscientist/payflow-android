@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import io.payflow.android.core.components.PayFlowBottomNavigation
 import io.payflow.android.core.components.catalog.DesignSystemScreen
 import io.payflow.android.core.navigation.Routes
+import io.payflow.android.core.session.repository.SessionRepository
 import io.payflow.android.feature.dashboard.ui.DashboardScreen
 import io.payflow.android.feature.profile.ui.ProfileScreen
 import io.payflow.android.feature.simulator.ui.SavingsSimulatorScreen
@@ -20,7 +21,9 @@ import io.payflow.android.feature.subscriptions.ui.SubscriptionDetailsScreen
 import io.payflow.android.feature.subscriptions.ui.SubscriptionsScreen
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    sessionRepository: SessionRepository
+) {
 
     val navController = rememberNavController()
 
@@ -46,7 +49,9 @@ fun MainScreen() {
         ) {
 
             composable(Routes.Dashboard.route) {
-                DashboardScreen()
+                DashboardScreen(
+                    sessionRepository = sessionRepository
+                )
             }
 
             composable(Routes.Subscriptions.route) {
