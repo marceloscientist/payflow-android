@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.Room
 import io.payflow.android.core.components.PayFlowEmptyState
 import io.payflow.android.core.components.PayFlowLoadingState
 import io.payflow.android.core.components.PayFlowSearchBar
@@ -36,6 +35,8 @@ import io.payflow.android.model.BillingFrequency
 import io.payflow.android.model.Subscription
 import io.payflow.android.model.SubscriptionStatus
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -44,11 +45,7 @@ fun SubscriptionsScreen(
 ) {
     val context = LocalContext.current
     val subscriptionRepository = androidx.compose.runtime.remember {
-        val database = Room.databaseBuilder(
-            context.applicationContext,
-            PayFlowDatabase::class.java,
-            "payflow.db"
-        ).build()
+        val database = PayFlowDatabase.getInstance(context)
 
         SubscriptionRepository(database.subscriptionDao())
     }
@@ -141,7 +138,7 @@ private fun SubscriptionListItem(
             serviceName = subscription.serviceName,
             plan = subscription.plan ?: subscription.category.name,
             price = brlFormat.format(subscription.price),
-            billingInfo = "${subscription.billingFrequency.toLabel()} · Todo dia ${subscription.billingDay}"
+            billingInfo = subscription.billingInfoLabel()
         )
 
         Box(
@@ -157,6 +154,22 @@ private fun SubscriptionListItem(
 private fun BillingFrequency.toLabel(): String = when (this) {
     BillingFrequency.MONTHLY -> "Mensal"
     BillingFrequency.YEARLY -> "Anual"
+}
+
+/**
+ * Texto de cobrança sensível à frequência:
+ * - Mensal: "Mensal · Todo dia 15"
+ * - Anual:  "Anual · Dia 15 de agosto" (mês de aniversário do cadastro)
+ */
+private fun Subscription.billingInfoLabel(): String = when (billingFrequency) {
+    BillingFrequency.MONTHLY ->
+        "${billingFrequency.toLabel()} · Todo dia $billingDay"
+
+    BillingFrequency.YEARLY -> {
+        val month = SimpleDateFormat("MMMM", Locale("pt", "BR"))
+            .format(Date(createdAt))
+        "${billingFrequency.toLabel()} · Dia $billingDay de $month"
+    }
 }
 
 private fun SubscriptionStatus.toStatusType(): PayFlowStatusType = when (this) {
