@@ -11,11 +11,12 @@ import androidx.compose.ui.Modifier
 @Composable
 fun PayFlowEmptyState(
     title: String,
-    message: String
+    message: String,
+    modifier: Modifier = Modifier
 ) {
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

@@ -11,11 +11,12 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun PayFlowLoadingState(
-    message: String = "Carregando..."
+    message: String = "Carregando...",
+    modifier: Modifier = Modifier
 ) {
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
