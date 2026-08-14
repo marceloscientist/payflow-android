@@ -67,7 +67,9 @@ fun MainScreen(
             }
 
             composable(Routes.Profile.route) {
-                ProfileScreen()
+                ProfileScreen(
+                    sessionRepository = sessionRepository
+                )
             }
 
             composable(Routes.DeveloperPlayground.route) {
