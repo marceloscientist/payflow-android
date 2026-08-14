@@ -16,8 +16,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.Room
 import io.payflow.android.core.components.PayFlowEmptyState
 import io.payflow.android.core.components.PayFlowLoadingState
 import io.payflow.android.core.components.PayFlowSearchBar
@@ -26,6 +28,8 @@ import io.payflow.android.core.components.PayFlowSubscriptionCard
 import io.payflow.android.core.components.PayFlowTopBar
 import io.payflow.android.core.components.model.PayFlowStatusType
 import io.payflow.android.core.state.UiState
+import io.payflow.android.data.local.database.PayFlowDatabase
+import io.payflow.android.data.repository.SubscriptionRepository
 import io.payflow.android.feature.subscriptions.viewmodel.SubscriptionsUiState
 import io.payflow.android.feature.subscriptions.viewmodel.SubscriptionsViewModel
 import io.payflow.android.model.BillingFrequency
@@ -36,9 +40,23 @@ import java.util.Locale
 
 @Composable
 fun SubscriptionsScreen(
-    onSubscriptionClick: (String) -> Unit,
-    viewModel: SubscriptionsViewModel = viewModel()
+    onSubscriptionClick: (String) -> Unit
 ) {
+    val context = LocalContext.current
+    val subscriptionRepository = androidx.compose.runtime.remember {
+        val database = Room.databaseBuilder(
+            context.applicationContext,
+            PayFlowDatabase::class.java,
+            "payflow.db"
+        ).build()
+
+        SubscriptionRepository(database.subscriptionDao())
+    }
+
+    val viewModel: SubscriptionsViewModel = viewModel(
+        factory = SubscriptionsViewModel.factory(subscriptionRepository)
+    )
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var query by rememberSaveable { mutableStateOf("") }
 
