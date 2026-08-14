@@ -26,5 +26,9 @@ sealed class Routes(
 
     data object AddSubscription : Routes("add_subscription")
 
-    data object SubscriptionDetails : Routes("subscription_details")
+    data object SubscriptionDetails : Routes("subscription_details") {
+        const val ARG_ID = "subscriptionId"
+        val routeWithArgs = "$route/{$ARG_ID}"
+        fun navigate(id: String) = "$route/$id"
+    }
 }
