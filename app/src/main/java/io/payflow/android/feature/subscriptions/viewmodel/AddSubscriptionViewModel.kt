@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.payflow.android.core.base.BaseViewModel
 import io.payflow.android.core.state.UiState
+import io.payflow.android.data.remote.dto.ServiceDto
+import io.payflow.android.data.remote.repository.CatalogRepository
 import io.payflow.android.data.repository.SubscriptionRepository
 import io.payflow.android.feature.subscriptions.model.AddSubscriptionFormState
 import io.payflow.android.model.BillingFrequency
@@ -14,6 +16,7 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 import java.util.UUID
+import kotlin.math.roundToLong
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,15 +34,53 @@ import kotlinx.coroutines.flow.update
  * - [UiState.Error]   falha ao persistir
  */
 class AddSubscriptionViewModel(
-    private val subscriptionRepository: SubscriptionRepository
+    private val subscriptionRepository: SubscriptionRepository,
+    private val catalogRepository: CatalogRepository = CatalogRepository()
 ) : BaseViewModel<AddSubscriptionUiState>() {
 
     private val _formState = MutableStateFlow(AddSubscriptionFormState())
     val formState: StateFlow<AddSubscriptionFormState> = _formState.asStateFlow()
 
+    private val _services = MutableStateFlow<List<ServiceDto>>(emptyList())
+    val services: StateFlow<List<ServiceDto>> = _services.asStateFlow()
+
     init {
         updateState(UiState.Empty)
+        loadCatalog()
     }
+
+    /**
+     * Carrega o catálogo de serviços da API (STORY-002) para sugestões.
+     * Falha silenciosa: as sugestões são um extra, o cadastro manual
+     * continua funcionando sem elas.
+     */
+    private fun loadCatalog() = launch {
+        runCatching {
+            catalogRepository.getServices()
+        }.onSuccess { services ->
+            _services.value = services
+        }
+    }
+
+    /**
+     * Preenche o formulário a partir de um serviço do catálogo.
+     */
+    fun selectService(service: ServiceDto) {
+        val cents = (service.price * CENTS_IN_REAL).roundToLong()
+
+        _formState.update {
+            it.copy(
+                serviceName = service.name,
+                category = service.category.toCategoryOrDefault(it.category),
+                priceInput = formatCurrencyInput(cents.toString()),
+                serviceNameError = null,
+                priceError = null
+            )
+        }
+    }
+
+    private fun String.toCategoryOrDefault(default: Category): Category =
+        Category.entries.firstOrNull { it.name == this } ?: default
 
     fun onServiceNameChange(value: String) {
         _formState.update { it.copy(serviceName = value, serviceNameError = null) }

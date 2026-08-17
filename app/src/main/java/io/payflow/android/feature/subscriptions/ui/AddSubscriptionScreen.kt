@@ -1,7 +1,10 @@
 package io.payflow.android.feature.subscriptions.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.payflow.android.core.components.PayFlowButton
+import io.payflow.android.core.components.PayFlowCard
 import io.payflow.android.core.components.PayFlowConfirmationDialog
 import io.payflow.android.core.components.PayFlowDropdown
 import io.payflow.android.core.components.PayFlowLoadingState
@@ -33,6 +37,7 @@ import io.payflow.android.core.components.PayFlowTopBar
 import io.payflow.android.core.components.model.PayFlowButtonType
 import io.payflow.android.core.state.UiState
 import io.payflow.android.data.local.database.PayFlowDatabase
+import io.payflow.android.data.remote.dto.ServiceDto
 import io.payflow.android.data.repository.SubscriptionRepository
 import io.payflow.android.feature.subscriptions.model.AddSubscriptionFormState
 import io.payflow.android.feature.subscriptions.viewmodel.AddSubscriptionViewModel
@@ -59,6 +64,7 @@ fun AddSubscriptionScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val formState by viewModel.formState.collectAsStateWithLifecycle()
+    val services by viewModel.services.collectAsStateWithLifecycle()
 
     var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -86,12 +92,14 @@ fun AddSubscriptionScreen(
             else -> {
                 AddSubscriptionForm(
                     formState = formState,
+                    services = services,
                     errorMessage = (uiState as? UiState.Error)?.message,
                     onServiceNameChange = viewModel::onServiceNameChange,
                     onCategoryChange = viewModel::onCategoryChange,
                     onPriceChange = viewModel::onPriceChange,
                     onBillingFrequencyChange = viewModel::onBillingFrequencyChange,
                     onBillingDayChange = viewModel::onBillingDayChange,
+                    onServiceSelected = viewModel::selectService,
                     onSaveClick = {
                         if (viewModel.validateForm()) {
                             showConfirmationDialog = true
@@ -120,12 +128,14 @@ fun AddSubscriptionScreen(
 @Composable
 private fun AddSubscriptionForm(
     formState: AddSubscriptionFormState,
+    services: List<ServiceDto>,
     errorMessage: String?,
     onServiceNameChange: (String) -> Unit,
     onCategoryChange: (Category) -> Unit,
     onPriceChange: (String) -> Unit,
     onBillingFrequencyChange: (BillingFrequency) -> Unit,
     onBillingDayChange: (String) -> Unit,
+    onServiceSelected: (ServiceDto) -> Unit,
     onSaveClick: () -> Unit
 ) {
     Column(
@@ -143,6 +153,12 @@ private fun AddSubscriptionForm(
             keyboardType = KeyboardType.Text,
             isError = formState.serviceNameError != null,
             supportingText = formState.serviceNameError
+        )
+
+        ServiceSuggestions(
+            query = formState.serviceName,
+            services = services,
+            onServiceSelected = onServiceSelected
         )
 
         PayFlowDropdown(
@@ -203,6 +219,58 @@ private fun AddSubscriptionForm(
         )
     }
 }
+
+/**
+ * Sugestões do catálogo de serviços (STORY-002) exibidas enquanto o
+ * usuário digita. Ao tocar em uma sugestão, nome, categoria e valor
+ * são preenchidos automaticamente.
+ */
+@Composable
+private fun ServiceSuggestions(
+    query: String,
+    services: List<ServiceDto>,
+    onServiceSelected: (ServiceDto) -> Unit
+) {
+    val trimmedQuery = query.trim()
+
+    if (trimmedQuery.isEmpty()) return
+
+    val suggestions = services
+        .filter { service ->
+            service.name.contains(trimmedQuery, ignoreCase = true) &&
+                !service.name.equals(trimmedQuery, ignoreCase = true)
+        }
+        .take(MAX_SUGGESTIONS)
+
+    if (suggestions.isEmpty()) return
+
+    val brlFormat = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
+
+    PayFlowCard(contentPadding = PaddingValues(vertical = 4.dp)) {
+        suggestions.forEach { service ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onServiceSelected(service) }
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                Text(
+                    text = service.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f)
+                )
+
+                Text(
+                    text = brlFormat.format(service.price),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+private const val MAX_SUGGESTIONS = 3
 
 private fun AddSubscriptionFormState.toConfirmationMessage(): String {
     val brlFormat = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
