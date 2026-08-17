@@ -106,6 +106,20 @@ fun MainScreen(
                 DesignSystemScreen()
             }
 
+//            composable(
+//                route = Routes.SubscriptionDetails.routeWithArgs,
+//                arguments = listOf(
+//                    navArgument(Routes.SubscriptionDetails.ARG_ID) {
+//                        type = NavType.StringType
+//                    }
+//                )
+//            ) { backStackEntry ->
+//                val subscriptionId = backStackEntry.arguments
+//                    ?.getString(Routes.SubscriptionDetails.ARG_ID)
+//                    ?: ""
+//                SubscriptionDetailsScreen(subscriptionId = subscriptionId)
+//            }
+
             composable(
                 route = Routes.SubscriptionDetails.routeWithArgs,
                 arguments = listOf(
@@ -117,7 +131,11 @@ fun MainScreen(
                 val subscriptionId = backStackEntry.arguments
                     ?.getString(Routes.SubscriptionDetails.ARG_ID)
                     ?: ""
-                SubscriptionDetailsScreen(subscriptionId = subscriptionId)
+                SubscriptionDetailsScreen(
+                    subscriptionId = subscriptionId,
+                    onNavigateBack = { navController.popBackStack() },
+                    onDeleted = { navController.popBackStack() }
+                )
             }
         }
     }
