@@ -15,6 +15,9 @@ interface SubscriptionDao : BaseDao {
     @Query("SELECT * FROM subscriptions ORDER BY createdAt DESC")
     fun getAll(): Flow<List<SubscriptionEntity>>
 
+    @Query("SELECT * FROM subscriptions ORDER BY createdAt DESC")
+    suspend fun getAllSnapshot(): List<SubscriptionEntity>
+
     @Query("SELECT * FROM subscriptions WHERE id = :id LIMIT 1")
     suspend fun getById(id: String): SubscriptionEntity?
 

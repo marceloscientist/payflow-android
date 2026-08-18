@@ -160,6 +160,7 @@ private fun SubscriptionSelectionItem(
         Checkbox(checked = selected, onCheckedChange = { onToggle() })
         PayFlowSubscriptionCard(
             serviceName = subscription.serviceName,
+            logoUrl = subscription.logoUrl,
             plan = subscription.plan ?: subscription.category.name,
             price = currencyFormat.format(subscription.price),
             billingInfo = subscription.billingFrequency.toSimulatorLabel(),

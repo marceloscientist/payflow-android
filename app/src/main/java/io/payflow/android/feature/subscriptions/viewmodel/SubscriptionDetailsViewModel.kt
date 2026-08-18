@@ -19,6 +19,7 @@ class SubscriptionDetailsViewModel(
     fun loadSubscription() = launch {
         updateState(UiState.Loading)
         try {
+            subscriptionRepository.syncCatalogBackedSubscriptions()
             val subscription = subscriptionRepository.getById(subscriptionId)
             if (subscription == null) {
                 updateState(UiState.Error("Assinatura não encontrada"))

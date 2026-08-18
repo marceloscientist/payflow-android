@@ -26,6 +26,7 @@ class SubscriptionsViewModel(
         updateState(UiState.Loading)
 
         try {
+            subscriptionRepository.syncCatalogBackedSubscriptions()
             subscriptionRepository.getAll().collect { subscriptions ->
                 allSubscriptions = subscriptions
                 publishFilteredState()

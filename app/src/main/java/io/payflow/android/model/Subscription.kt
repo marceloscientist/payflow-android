@@ -5,6 +5,7 @@ data class Subscription(
     val userId: String,
     val serviceId: String,
     val serviceName: String,
+    val logoUrl: String? = null,
     val category: Category,
     val plan: String? = null,
     val price: Double,

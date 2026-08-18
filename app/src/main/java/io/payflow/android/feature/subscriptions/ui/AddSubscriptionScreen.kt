@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +34,7 @@ import io.payflow.android.core.components.PayFlowCard
 import io.payflow.android.core.components.PayFlowConfirmationDialog
 import io.payflow.android.core.components.PayFlowDropdown
 import io.payflow.android.core.components.PayFlowLoadingState
+import io.payflow.android.core.components.PayFlowServiceLogo
 import io.payflow.android.core.components.PayFlowTextField
 import io.payflow.android.core.components.PayFlowTopBar
 import io.payflow.android.core.components.model.PayFlowButtonType
@@ -65,6 +68,8 @@ fun AddSubscriptionScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val formState by viewModel.formState.collectAsStateWithLifecycle()
     val services by viewModel.services.collectAsStateWithLifecycle()
+    val isCatalogLoading by viewModel.isCatalogLoading.collectAsStateWithLifecycle()
+    val catalogErrorMessage by viewModel.catalogErrorMessage.collectAsStateWithLifecycle()
 
     var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -93,6 +98,8 @@ fun AddSubscriptionScreen(
                 AddSubscriptionForm(
                     formState = formState,
                     services = services,
+                    isCatalogLoading = isCatalogLoading,
+                    catalogErrorMessage = catalogErrorMessage,
                     errorMessage = (uiState as? UiState.Error)?.message,
                     onServiceNameChange = viewModel::onServiceNameChange,
                     onCategoryChange = viewModel::onCategoryChange,
@@ -129,6 +136,8 @@ fun AddSubscriptionScreen(
 private fun AddSubscriptionForm(
     formState: AddSubscriptionFormState,
     services: List<ServiceDto>,
+    isCatalogLoading: Boolean,
+    catalogErrorMessage: String?,
     errorMessage: String?,
     onServiceNameChange: (String) -> Unit,
     onCategoryChange: (Category) -> Unit,
@@ -158,6 +167,8 @@ private fun AddSubscriptionForm(
         ServiceSuggestions(
             query = formState.serviceName,
             services = services,
+            isCatalogLoading = isCatalogLoading,
+            catalogErrorMessage = catalogErrorMessage,
             onServiceSelected = onServiceSelected
         )
 
@@ -229,18 +240,48 @@ private fun AddSubscriptionForm(
 private fun ServiceSuggestions(
     query: String,
     services: List<ServiceDto>,
+    isCatalogLoading: Boolean,
+    catalogErrorMessage: String?,
     onServiceSelected: (ServiceDto) -> Unit
 ) {
-    val trimmedQuery = query.trim()
+    if (isCatalogLoading) {
+        PayFlowCard(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+            ) {
+                CircularProgressIndicator(modifier = Modifier.height(20.dp))
+                Text(
+                    text = "Carregando servicos...",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+        return
+    }
 
-    if (trimmedQuery.isEmpty()) return
+    if (catalogErrorMessage != null) {
+        Text(
+            text = catalogErrorMessage,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.fillMaxWidth()
+        )
+        return
+    }
+
+    if (services.isEmpty()) return
+
+    val trimmedQuery = query.trim()
 
     val suggestions = services
         .filter { service ->
-            service.name.contains(trimmedQuery, ignoreCase = true) &&
-                !service.name.equals(trimmedQuery, ignoreCase = true)
+            trimmedQuery.isBlank() || (
+                service.name.contains(trimmedQuery, ignoreCase = true) &&
+                    !service.name.equals(trimmedQuery, ignoreCase = true)
+                )
         }
-        .take(MAX_SUGGESTIONS)
 
     if (suggestions.isEmpty()) return
 
@@ -252,13 +293,23 @@ private fun ServiceSuggestions(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onServiceSelected(service) }
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
             ) {
+                PayFlowServiceLogo(
+                    serviceName = service.name,
+                    logoUrl = service.logo,
+                    size = 40.dp
+                )
+
                 Text(
                     text = service.name,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.weight(1f)
                 )
+
+                Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
                     text = brlFormat.format(service.price),
@@ -269,8 +320,6 @@ private fun ServiceSuggestions(
         }
     }
 }
-
-private const val MAX_SUGGESTIONS = 3
 
 private fun AddSubscriptionFormState.toConfirmationMessage(): String {
     val brlFormat = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))

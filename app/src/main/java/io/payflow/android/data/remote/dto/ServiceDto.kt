@@ -4,5 +4,6 @@ data class ServiceDto(
 	val id: String,
 	val name: String,
 	val category: String,
-	val price: Double
+	val price: Double,
+	val logo: String? = null
 )

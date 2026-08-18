@@ -20,6 +20,7 @@ class DashboardViewModel(
         updateState(UiState.Loading)
 
         try {
+            subscriptionRepository.syncCatalogBackedSubscriptions()
             subscriptionRepository.getAll().collect { subscriptions ->
                 val activeSubscriptions = subscriptions.filter {
                     it.status == SubscriptionStatus.ACTIVE

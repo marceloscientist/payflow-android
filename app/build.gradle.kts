@@ -17,11 +17,34 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        val httpProxyHost = project.findProperty("PAYFLOW_HTTP_PROXY_HOST")?.toString() ?: ""
+        val httpProxyPort = project.findProperty("PAYFLOW_HTTP_PROXY_PORT")?.toString()?.toIntOrNull() ?: 0
+        val enableUnsafeSsl = project.findProperty("PAYFLOW_ENABLE_UNSAFE_SSL")?.toString()?.toBoolean() ?: false
+        val dnsOverrideHost = project.findProperty("PAYFLOW_DNS_OVERRIDE_HOST")?.toString() ?: ""
+        val dnsOverrideAddresses = project.findProperty("PAYFLOW_DNS_OVERRIDE_ADDRESSES")?.toString() ?: ""
+
+        buildConfigField("String", "HTTP_PROXY_HOST", "\"$httpProxyHost\"")
+        buildConfigField("int", "HTTP_PROXY_PORT", httpProxyPort.toString())
+        buildConfigField("boolean", "ENABLE_UNSAFE_SSL", enableUnsafeSsl.toString())
+        buildConfigField("String", "DNS_OVERRIDE_HOST", "\"$dnsOverrideHost\"")
+        buildConfigField("String", "DNS_OVERRIDE_ADDRESSES", "\"$dnsOverrideAddresses\"")
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
+        debug {
+            // Workaround para testes no ambiente corporativo.
+            // Se quiser desligar o bypass de certificado, defina
+            // PAYFLOW_ENABLE_UNSAFE_SSL=false no gradle.properties
+            // ou remova este buildConfigField.
+            val debugUnsafeSsl = project.findProperty("PAYFLOW_ENABLE_UNSAFE_SSL")?.toString()?.toBoolean() ?: true
+            buildConfigField("boolean", "ENABLE_UNSAFE_SSL", debugUnsafeSsl.toString())
+        }
+
         release {
+            // Em release o bypass deve permanecer desligado.
+            buildConfigField("boolean", "ENABLE_UNSAFE_SSL", "false")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -37,6 +60,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -62,6 +86,7 @@ dependencies {
     kapt(libs.androidx.room.compiler)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+    implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

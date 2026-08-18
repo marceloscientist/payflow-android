@@ -28,6 +28,7 @@ private fun ServiceDto.toSubscription(): Subscription {
         userId = "remote-catalog",
         serviceId = id,
         serviceName = name,
+        logoUrl = logo,
         category = category.toDomainCategory(),
         plan = null,
         price = price,
@@ -45,7 +46,8 @@ private fun String.toDomainCategory(): Category {
     return when (trim().uppercase()) {
         Category.STREAMING.name -> Category.STREAMING
         Category.MUSIC.name -> Category.MUSIC
-        Category.GAMES.name -> Category.GAMES
+        Category.GAMES.name,
+        "GAMING" -> Category.GAMES
         Category.AI_PRODUCTIVITY.name -> Category.AI_PRODUCTIVITY
         Category.CLOUD_STORAGE.name -> Category.CLOUD_STORAGE
         Category.EDUCATION.name -> Category.EDUCATION
