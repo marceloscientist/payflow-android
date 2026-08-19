@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import io.payflow.android.core.components.PayFlowCard
 import io.payflow.android.core.components.PayFlowChip
 import io.payflow.android.core.components.PayFlowConfirmationDialog
-import io.payflow.android.core.components.PayFlowDropdown
 import io.payflow.android.core.components.PayFlowEmptyState
 import io.payflow.android.core.components.PayFlowLoadingState
 import io.payflow.android.core.components.PayFlowMetricCard
@@ -47,10 +46,6 @@ fun DesignSystemScreen() {
 
     var showDialog by remember {
         mutableStateOf(false)
-    }
-
-    var selectedService by remember {
-        mutableStateOf("Netflix")
     }
 
     Column(
@@ -170,13 +165,6 @@ fun DesignSystemScreen() {
 
         PayFlowTopBar(
             title = "PayFlow"
-        )
-
-        PayFlowDropdown(
-            label = "Serviço",
-            options = listOf("Netflix", "Spotify", "Disney+"),
-            selectedOption = selectedService,
-            onOptionSelected = { selectedService = it }
         )
 
         PayFlowProfileHeader(

@@ -26,6 +26,7 @@ class SubscriptionSimulatorViewModel(
 		updateState(UiState.Loading)
 
 		try {
+			subscriptionRepository.syncCatalogBackedSubscriptions()
 			subscriptionRepository.getAll().collect { loadedSubscriptions ->
 				subscriptions = loadedSubscriptions
 					.filter { it.status == SubscriptionStatus.ACTIVE }

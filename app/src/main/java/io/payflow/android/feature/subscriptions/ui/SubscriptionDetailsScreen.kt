@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +31,7 @@ import io.payflow.android.core.components.PayFlowCard
 import io.payflow.android.core.components.PayFlowConfirmationDialog
 import io.payflow.android.core.components.PayFlowEmptyState
 import io.payflow.android.core.components.PayFlowLoadingState
+import io.payflow.android.core.components.PayFlowServiceLogo
 import io.payflow.android.core.components.PayFlowStatusBadge
 import io.payflow.android.core.components.PayFlowTopBar
 import io.payflow.android.core.components.model.PayFlowButtonType
@@ -130,8 +132,15 @@ private fun SubscriptionDetailsContent(
         PayFlowCard {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(PayFlowSpacing.MD),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
             ) {
+                PayFlowServiceLogo(
+                    serviceName = subscription.serviceName,
+                    logoUrl = subscription.logoUrl,
+                    size = 56.dp
+                )
+
                 Text(
                     text = subscription.serviceName,
                     style = MaterialTheme.typography.headlineSmall,

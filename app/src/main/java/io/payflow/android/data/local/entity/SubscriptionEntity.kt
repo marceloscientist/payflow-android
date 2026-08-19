@@ -10,6 +10,7 @@ data class SubscriptionEntity(
     val userId: String,
     val serviceId: String,
     val serviceName: String,
+    val logoUrl: String?,
     val category: String,
     val plan: String?,
     val price: Double,

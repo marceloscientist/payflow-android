@@ -10,6 +10,8 @@ import io.payflow.android.model.Category
  * de cada campo. A conversão para o domínio ocorre no ViewModel.
  */
 data class AddSubscriptionFormState(
+    val selectedServiceId: String? = null,
+    val selectedServiceLogoUrl: String? = null,
     val serviceName: String = "",
     val category: Category = Category.STREAMING,
     val priceInput: String = "",

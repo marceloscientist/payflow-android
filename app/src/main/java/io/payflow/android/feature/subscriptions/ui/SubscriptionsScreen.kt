@@ -136,6 +136,7 @@ private fun SubscriptionListItem(
     ) {
         PayFlowSubscriptionCard(
             serviceName = subscription.serviceName,
+            logoUrl = subscription.logoUrl,
             plan = subscription.plan ?: subscription.category.name,
             price = brlFormat.format(subscription.price),
             billingInfo = subscription.billingInfoLabel()

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.payflow.android.core.base.BaseViewModel
 import io.payflow.android.core.state.UiState
+import io.payflow.android.core.utils.Logger
 import io.payflow.android.data.remote.dto.ServiceDto
 import io.payflow.android.data.remote.repository.CatalogRepository
 import io.payflow.android.data.repository.SubscriptionRepository
@@ -44,6 +45,12 @@ class AddSubscriptionViewModel(
     private val _services = MutableStateFlow<List<ServiceDto>>(emptyList())
     val services: StateFlow<List<ServiceDto>> = _services.asStateFlow()
 
+    private val _isCatalogLoading = MutableStateFlow(false)
+    val isCatalogLoading: StateFlow<Boolean> = _isCatalogLoading.asStateFlow()
+
+    private val _catalogErrorMessage = MutableStateFlow<String?>(null)
+    val catalogErrorMessage: StateFlow<String?> = _catalogErrorMessage.asStateFlow()
+
     init {
         updateState(UiState.Empty)
         loadCatalog()
@@ -55,11 +62,30 @@ class AddSubscriptionViewModel(
      * continua funcionando sem elas.
      */
     private fun loadCatalog() = launch {
+        _isCatalogLoading.value = true
+        _catalogErrorMessage.value = null
+
+        Logger.debug(TAG, "Iniciando carregamento do catalogo de servicos")
+
         runCatching {
             catalogRepository.getServices()
         }.onSuccess { services ->
             _services.value = services
+            Logger.debug(
+                TAG,
+                "Catalogo carregado com ${services.size} servicos. Primeiros itens: ${services.take(3).joinToString { it.name }}"
+            )
+        }.onFailure { exception ->
+            _catalogErrorMessage.value =
+                exception.message ?: "Nao foi possivel carregar os servicos agora"
+            Logger.error(
+                TAG,
+                "Falha ao carregar catalogo: ${exception.message}",
+                exception
+            )
         }
+
+        _isCatalogLoading.value = false
     }
 
     /**
@@ -70,6 +96,8 @@ class AddSubscriptionViewModel(
 
         _formState.update {
             it.copy(
+                selectedServiceId = service.id,
+                selectedServiceLogoUrl = service.logo,
                 serviceName = service.name,
                 category = service.category.toCategoryOrDefault(it.category),
                 priceInput = formatCurrencyInput(cents.toString()),
@@ -80,10 +108,26 @@ class AddSubscriptionViewModel(
     }
 
     private fun String.toCategoryOrDefault(default: Category): Category =
-        Category.entries.firstOrNull { it.name == this } ?: default
+        when (trim().uppercase()) {
+            Category.STREAMING.name -> Category.STREAMING
+            Category.MUSIC.name -> Category.MUSIC
+            Category.GAMES.name,
+            "GAMING" -> Category.GAMES
+            Category.AI_PRODUCTIVITY.name -> Category.AI_PRODUCTIVITY
+            Category.CLOUD_STORAGE.name -> Category.CLOUD_STORAGE
+            Category.EDUCATION.name -> Category.EDUCATION
+            else -> default
+        }
 
     fun onServiceNameChange(value: String) {
-        _formState.update { it.copy(serviceName = value, serviceNameError = null) }
+        _formState.update {
+            it.copy(
+                selectedServiceId = null,
+                selectedServiceLogoUrl = null,
+                serviceName = value,
+                serviceNameError = null
+            )
+        }
     }
 
     fun onCategoryChange(category: Category) {
@@ -184,8 +228,9 @@ class AddSubscriptionViewModel(
         return Subscription(
             id = UUID.randomUUID().toString(),
             userId = DEFAULT_USER_ID,
-            serviceId = name.lowercase().replace(WHITESPACE_REGEX, "-"),
+            serviceId = selectedServiceId ?: name.lowercase().replace(WHITESPACE_REGEX, "-"),
             serviceName = name,
+            logoUrl = selectedServiceLogoUrl,
             category = category,
             price = requireNotNull(parsedPrice()) { "Valor inválido" },
             billingFrequency = billingFrequency,
@@ -196,6 +241,7 @@ class AddSubscriptionViewModel(
     }
 
     companion object {
+        private const val TAG = "AddSubscriptionVM"
 
         private const val DEFAULT_USER_ID = "local-user"
         private const val MIN_SERVICE_NAME_LENGTH = 2
