@@ -1,6 +1,5 @@
 package io.payflow.android.feature.subscriptions.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -55,6 +54,7 @@ import java.util.Locale
 fun SubscriptionDetailsScreen(
     subscriptionId: String,
     onNavigateBack: () -> Unit,
+    onEdit: () -> Unit,
     onDeleted: () -> Unit
 ) {
     val context = LocalContext.current
@@ -91,13 +91,7 @@ fun SubscriptionDetailsScreen(
             )
             is UiState.Success -> SubscriptionDetailsContent(
                 subscription = state.data,
-                onEdit = {
-                    Toast.makeText(
-                        context,
-                        "Funcionalidade disponível em breve",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                },
+                onEdit = onEdit,
                 onDelete = { showDeleteDialog = true }
             )
         }

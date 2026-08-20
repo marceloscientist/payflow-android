@@ -92,6 +92,24 @@ fun MainScreen(
                 )
             }
 
+            composable(
+                route = Routes.EditSubscription.routeWithArgs,
+                arguments = listOf(
+                    navArgument(Routes.EditSubscription.ARG_ID) {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val subscriptionId = backStackEntry.arguments
+                    ?.getString(Routes.EditSubscription.ARG_ID)
+                    ?: ""
+                AddSubscriptionScreen(
+                    editingSubscriptionId = subscriptionId,
+                    onSaved = { navController.popBackStack() },
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
             composable(Routes.Simulator.route) {
                 SavingsSimulatorScreen()
             }
@@ -134,6 +152,9 @@ fun MainScreen(
                 SubscriptionDetailsScreen(
                     subscriptionId = subscriptionId,
                     onNavigateBack = { navController.popBackStack() },
+                    onEdit = {
+                        navController.navigate(Routes.EditSubscription.navigate(subscriptionId))
+                    },
                     onDeleted = { navController.popBackStack() }
                 )
             }

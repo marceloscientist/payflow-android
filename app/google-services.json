@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "636454999959",
+    "project_id": "payflow-a42b1",
+    "storage_bucket": "payflow-a42b1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:636454999959:android:5ebd084c10df765e7ed6d2",
+        "android_client_info": {
+          "package_name": "io.payflow.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmWskQmx3vUMrqqy5VYd2p5656YgAsauc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

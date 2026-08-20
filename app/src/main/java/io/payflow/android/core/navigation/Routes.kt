@@ -8,6 +8,8 @@ sealed class Routes(
 
     data object Login : Routes("login")
 
+    data object Register : Routes("register")
+
     data object Main : Routes("main")
 
     // Bottom Navigation
@@ -25,6 +27,12 @@ sealed class Routes(
     // Rotas Secundárias
 
     data object AddSubscription : Routes("add_subscription")
+
+    data object EditSubscription : Routes("edit_subscription") {
+        const val ARG_ID = "subscriptionId"
+        val routeWithArgs = "$route/{$ARG_ID}"
+        fun navigate(id: String) = "$route/$id"
+    }
 
     data object SubscriptionDetails : Routes("subscription_details") {
         const val ARG_ID = "subscriptionId"

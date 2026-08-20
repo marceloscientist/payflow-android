@@ -52,7 +52,8 @@ import java.util.Locale
 @Composable
 fun AddSubscriptionScreen(
     onSaved: () -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    editingSubscriptionId: String? = null
 ) {
     val context = LocalContext.current
     val subscriptionRepository = remember {
@@ -62,7 +63,8 @@ fun AddSubscriptionScreen(
     }
 
     val viewModel: AddSubscriptionViewModel = viewModel(
-        factory = AddSubscriptionViewModel.factory(subscriptionRepository)
+        key = editingSubscriptionId?.let { "edit-subscription-$it" } ?: "add-subscription",
+        factory = AddSubscriptionViewModel.factory(subscriptionRepository, editingSubscriptionId)
     )
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -71,6 +73,7 @@ fun AddSubscriptionScreen(
     val isCatalogLoading by viewModel.isCatalogLoading.collectAsStateWithLifecycle()
     val catalogErrorMessage by viewModel.catalogErrorMessage.collectAsStateWithLifecycle()
 
+    val isEditing = editingSubscriptionId != null
     var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(uiState) {
@@ -82,7 +85,7 @@ fun AddSubscriptionScreen(
     Column(modifier = Modifier.fillMaxSize()) {
 
         PayFlowTopBar(
-            title = "Nova Assinatura",
+            title = if (isEditing) "Editar Assinatura" else "Nova Assinatura",
             onNavigateBack = onNavigateBack
         )
 
@@ -90,7 +93,7 @@ fun AddSubscriptionScreen(
 
             is UiState.Loading -> {
                 PayFlowLoadingState(
-                    message = "Salvando assinatura..."
+                    message = if (isEditing) "Atualizando assinatura..." else "Salvando assinatura..."
                 )
             }
 
@@ -107,6 +110,7 @@ fun AddSubscriptionScreen(
                     onBillingFrequencyChange = viewModel::onBillingFrequencyChange,
                     onBillingDayChange = viewModel::onBillingDayChange,
                     onServiceSelected = viewModel::selectService,
+                    saveButtonLabel = if (isEditing) "Salvar alterações" else "Salvar assinatura",
                     onSaveClick = {
                         if (viewModel.validateForm()) {
                             showConfirmationDialog = true
@@ -119,8 +123,8 @@ fun AddSubscriptionScreen(
 
     if (showConfirmationDialog) {
         PayFlowConfirmationDialog(
-            title = "Confirmar cadastro",
-            message = formState.toConfirmationMessage(),
+            title = if (isEditing) "Confirmar alterações" else "Confirmar cadastro",
+            message = formState.toConfirmationMessage(isEditing),
             onConfirm = {
                 showConfirmationDialog = false
                 viewModel.save()
@@ -145,6 +149,7 @@ private fun AddSubscriptionForm(
     onBillingFrequencyChange: (BillingFrequency) -> Unit,
     onBillingDayChange: (String) -> Unit,
     onServiceSelected: (ServiceDto) -> Unit,
+    saveButtonLabel: String,
     onSaveClick: () -> Unit
 ) {
     Column(
@@ -224,7 +229,7 @@ private fun AddSubscriptionForm(
         Spacer(modifier = Modifier.height(8.dp))
 
         PayFlowButton(
-            text = "Salvar assinatura",
+            text = saveButtonLabel,
             type = PayFlowButtonType.PRIMARY,
             onClick = onSaveClick
         )
@@ -321,7 +326,7 @@ private fun ServiceSuggestions(
     }
 }
 
-private fun AddSubscriptionFormState.toConfirmationMessage(): String {
+private fun AddSubscriptionFormState.toConfirmationMessage(isEditing: Boolean = false): String {
     val brlFormat = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
     val price = parsedPrice()?.let(brlFormat::format) ?: priceInput
 
@@ -330,7 +335,9 @@ private fun AddSubscriptionFormState.toConfirmationMessage(): String {
         BillingFrequency.YEARLY -> "uma vez ao ano, no dia ${billingDayInput.trim()}"
     }
 
-    return "Cadastrar \"${serviceName.trim()}\" " +
+    val verb = if (isEditing) "Atualizar" else "Cadastrar"
+
+    return "$verb \"${serviceName.trim()}\" " +
         "(${category.toLabel()}) por $price " +
         "(${billingFrequency.toLabel()}), $cadence?"
 }

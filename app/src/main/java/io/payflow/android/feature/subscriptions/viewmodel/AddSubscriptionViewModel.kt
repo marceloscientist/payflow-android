@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.update
  */
 class AddSubscriptionViewModel(
     private val subscriptionRepository: SubscriptionRepository,
+    private val editingSubscriptionId: String? = null,
     private val catalogRepository: CatalogRepository = CatalogRepository()
 ) : BaseViewModel<AddSubscriptionUiState>() {
 
@@ -51,9 +52,37 @@ class AddSubscriptionViewModel(
     private val _catalogErrorMessage = MutableStateFlow<String?>(null)
     val catalogErrorMessage: StateFlow<String?> = _catalogErrorMessage.asStateFlow()
 
+    /**
+     * Assinatura sendo editada. Preservada para manter campos que
+     * não estão no formulário (id, userId, serviceId, createdAt, status).
+     */
+    private var editingSubscription: Subscription? = null
+
+    val isEditing: Boolean get() = editingSubscriptionId != null
+
     init {
         updateState(UiState.Empty)
         loadCatalog()
+        editingSubscriptionId?.let(::loadSubscription)
+    }
+
+    private fun loadSubscription(id: String) = launch {
+        runCatching { subscriptionRepository.getById(id) }
+            .onSuccess { subscription ->
+                if (subscription != null) {
+                    editingSubscription = subscription
+                    val cents = (subscription.price * CENTS_IN_REAL).roundToLong()
+                    _formState.update {
+                        it.copy(
+                            serviceName = subscription.serviceName,
+                            category = subscription.category,
+                            priceInput = formatCurrencyInput(cents.toString()),
+                            billingFrequency = subscription.billingFrequency,
+                            billingDayInput = subscription.billingDay.toString()
+                        )
+                    }
+                }
+            }
     }
 
     /**
@@ -211,7 +240,11 @@ class AddSubscriptionViewModel(
 
         try {
             val subscription = _formState.value.toSubscription()
-            subscriptionRepository.insert(subscription)
+            if (editingSubscription != null) {
+                subscriptionRepository.update(subscription)
+            } else {
+                subscriptionRepository.insert(subscription)
+            }
             updateState(UiState.Success(AddSubscriptionUiState(subscription)))
         } catch (exception: Exception) {
             updateState(
@@ -224,19 +257,22 @@ class AddSubscriptionViewModel(
 
     private fun AddSubscriptionFormState.toSubscription(): Subscription {
         val name = serviceName.trim()
+        val existing = editingSubscription
 
         return Subscription(
-            id = UUID.randomUUID().toString(),
-            userId = DEFAULT_USER_ID,
-            serviceId = selectedServiceId ?: name.lowercase().replace(WHITESPACE_REGEX, "-"),
+            id = existing?.id ?: UUID.randomUUID().toString(),
+            userId = existing?.userId ?: DEFAULT_USER_ID,
+            serviceId = existing?.serviceId
+                ?: selectedServiceId
+                ?: name.lowercase().replace(WHITESPACE_REGEX, "-"),
             serviceName = name,
             logoUrl = selectedServiceLogoUrl,
             category = category,
             price = requireNotNull(parsedPrice()) { "Valor inválido" },
             billingFrequency = billingFrequency,
             billingDay = requireNotNull(parsedBillingDay()) { "Dia de cobrança inválido" },
-            status = SubscriptionStatus.ACTIVE,
-            createdAt = System.currentTimeMillis()
+            status = existing?.status ?: SubscriptionStatus.ACTIVE,
+            createdAt = existing?.createdAt ?: System.currentTimeMillis()
         )
     }
 
@@ -252,13 +288,17 @@ class AddSubscriptionViewModel(
         private val WHITESPACE_REGEX = Regex("\\s+")
 
         fun factory(
-            subscriptionRepository: SubscriptionRepository
+            subscriptionRepository: SubscriptionRepository,
+            editingSubscriptionId: String? = null
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     if (modelClass.isAssignableFrom(AddSubscriptionViewModel::class.java)) {
-                        return AddSubscriptionViewModel(subscriptionRepository) as T
+                        return AddSubscriptionViewModel(
+                            subscriptionRepository = subscriptionRepository,
+                            editingSubscriptionId = editingSubscriptionId
+                        ) as T
                     }
 
                     throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
